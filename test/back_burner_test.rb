@@ -72,6 +72,20 @@ describe "Backburner module" do
         Backburner.configuration.namespace_separator = ':'
       end
     end
+
+    context 'hooks' do
+      it 'are added as singleton methods' do
+        Backburner.configure{ |config| config.hooks = [{class_name: Backburner::Job, event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
+        Backburner.configuration.attach_hooks
+        assert_includes(Backburner::Job.singleton_methods, :before_enqueue)
+      end
+
+      it 'execute the code present in the lambda' do
+        Backburner.configure{ |config| config.hooks = [{class_name: Backburner::Job, event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
+        Backburner.configuration.attach_hooks
+        assert_equal("Hello, World!", Backburner::Job.before_enqueue)
+      end
+    end
   end # configuration
 
   describe "for default_queues" do
@@ -84,5 +98,6 @@ describe "Backburner module" do
 
   after do
     Backburner.configure { |config| config.default_worker = Backburner::Workers::Simple }
+    Backburner::Job.send(:remove_method, :before_enqueue) if Backburner::Job.method_defined?(:before_enqueue)
   end
 end # Backburner

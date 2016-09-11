@@ -126,6 +126,8 @@ The key options available are:
 | `reserve_timeout`     | Duration to wait for work from a single server, or nil for forever.             |
 | `hooks`               | Provides an easier way to write hooks for all jobs by using an array of hashes. |
 
+**Note**: Hooks added at an individual job level overrides these hooks.
+
 ## Breaking Changes
 
 Before **v0.4.0**: Jobs were placed into default queues based on the name of the class creating the queue. i.e NewsletterJob would

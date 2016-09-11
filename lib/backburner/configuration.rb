@@ -46,7 +46,7 @@ module Backburner
 
     def attach_hooks
       hooks.each do |hook|
-        hook[:class_name].send(:define_method, hook[:event], hook[:code_block])
+        hook[:class_name].send(:define_singleton_method, hook[:event], hook[:code_block])
       end
     end
   end # Configuration
