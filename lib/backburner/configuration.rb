@@ -8,6 +8,7 @@ module Backburner
     attr_accessor :default_priority    # default job priority
     attr_accessor :respond_timeout     # default job timeout
     attr_accessor :on_error            # error handler
+    attr_accessor :hooks               # hooks handler
     attr_accessor :max_job_retries     # max job retries
     attr_accessor :retry_delay         # (minimum) retry delay in seconds
     attr_accessor :retry_delay_proc    # proc to calculate delay (and allow for back-off)
@@ -25,6 +26,7 @@ module Backburner
       @default_priority    = 65536
       @respond_timeout     = 120
       @on_error            = nil
+      @hooks               = [] # { class_name: Job. event: 'on_bury', code_block: Proc.new{ puts "Hello, World!"  } }
       @max_job_retries     = 0
       @retry_delay         = 5
       @retry_delay_proc    = lambda { |min_retry_delay, num_retries| min_retry_delay + (num_retries ** 3) }
@@ -34,11 +36,18 @@ module Backburner
       @primary_queue       = "backburner-jobs"
       @priority_labels     = PRIORITY_LABELS
       @reserve_timeout     = nil
+      attach_hooks
     end
 
     def namespace_separator=(val)
       raise 'Namespace separator cannot used reserved queue configuration separator ":"' if val == ':'
       @namespace_separator = val
+    end
+
+    def attach_hooks
+      hooks.each do |hook|
+        hook[:class_name].send(:define_method, hook[:event], hook[:code_block])
+      end
     end
   end # Configuration
 end # Backburner

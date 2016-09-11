@@ -102,27 +102,29 @@ Backburner.configure do |config|
   config.primary_queue       = "backburner-jobs"
   config.priority_labels     = { :custom => 50, :useless => 1000 }
   config.reserve_timeout     = nil
+  config.hooks               = [{ class_name: Backburner::Job, event: 'on_bury', code_block: lambda { Airbrake.notify(e) } }]
 end
 ```
 
 The key options available are:
 
-| Option                | Description                                                          |
-| -----------------     | -------------------------------                                      |
-| `beanstalk_url`       | Address such as 'beanstalk://127.0.0.1' or an array of addresses.    |
-| `tube_namespace`      | Prefix used for all tubes related to this backburner queue.          |
-| `namespace_separator` | Separator used for namespace and queue name                          |
-| `on_error`            | Lambda invoked with the error whenever any job in the system fails.  |
-| `max_job_retries`     | Integer defines how many times to retry a job before burying.        |
-| `retry_delay`         | Integer defines the base time to wait (in secs) between job retries. |
-| `retry_delay_proc`    | Lambda calculates the delay used, allowing for exponential back-off. |
-| `default_priority`    | Integer The default priority of jobs                                 |
-| `respond_timeout`     | Integer defines how long a job has to complete its task              |
-| `default_worker`      | Worker class that will be used if no other worker is specified.      |
-| `logger`              | Logger recorded to when backburner wants to report info or errors.   |
-| `primary_queue`       | Primary queue used for a job when an alternate queue is not given.   |
-| `priority_labels`     | Hash of named priority definitions for your app.                     |
-| `reserve_timeout`     | Duration to wait for work from a single server, or nil for forever.  |
+| Option                | Description                                                                     |
+| -----------------     | -------------------------------                                                 |
+| `beanstalk_url`       | Address such as 'beanstalk://127.0.0.1' or an array of addresses.               |
+| `tube_namespace`      | Prefix used for all tubes related to this backburner queue.                     |
+| `namespace_separator` | Separator used for namespace and queue name                                     |
+| `on_error`            | Lambda invoked with the error whenever any job in the system fails.             |
+| `max_job_retries`     | Integer defines how many times to retry a job before burying.                   |
+| `retry_delay`         | Integer defines the base time to wait (in secs) between job retries.            |
+| `retry_delay_proc`    | Lambda calculates the delay used, allowing for exponential back-off.            |
+| `default_priority`    | Integer The default priority of jobs                                            |
+| `respond_timeout`     | Integer defines how long a job has to complete its task                         |
+| `default_worker`      | Worker class that will be used if no other worker is specified.                 |
+| `logger`              | Logger recorded to when backburner wants to report info or errors.              |
+| `primary_queue`       | Primary queue used for a job when an alternate queue is not given.              |
+| `priority_labels`     | Hash of named priority definitions for your app.                                |
+| `reserve_timeout`     | Duration to wait for work from a single server, or nil for forever.             |
+| `hooks`               | Provides an easier way to write hooks for all jobs by using an array of hashes. |
 
 ## Breaking Changes
 
