@@ -102,7 +102,7 @@ Backburner.configure do |config|
   config.primary_queue       = "backburner-jobs"
   config.priority_labels     = { :custom => 50, :useless => 1000 }
   config.reserve_timeout     = nil
-  config.hooks               = [{ class_name: Backburner::Job, event: 'on_bury', code_block: lambda { Airbrake.notify(e) } }]
+  config.hooks               = [{ class_name: 'Backburner::Job', event: 'on_bury', code_block: lambda { Airbrake.notify(e) } }]
 end
 ```
 

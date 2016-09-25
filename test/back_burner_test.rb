@@ -75,14 +75,12 @@ describe "Backburner module" do
 
     context 'hooks' do
       it 'are added as singleton methods' do
-        Backburner.configure{ |config| config.hooks = [{class_name: Backburner::Job, event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
-        Backburner.configuration.attach_hooks
+        Backburner.configure{ |config| config.hooks = [{class_name: 'Backburner::Job', event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
         assert_includes(Backburner::Job.singleton_methods, :before_enqueue)
       end
 
       it 'execute the code present in the lambda' do
-        Backburner.configure{ |config| config.hooks = [{class_name: Backburner::Job, event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
-        Backburner.configuration.attach_hooks
+        Backburner.configure{ |config| config.hooks = [{class_name: 'Backburner::Job', event: 'before_enqueue', code_block: lambda { "Hello, World!" } }] }
         assert_equal("Hello, World!", Backburner::Job.before_enqueue)
       end
     end

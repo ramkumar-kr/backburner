@@ -97,3 +97,28 @@ class MyWorker < Backburner::Worker
     prepare
   end
 end
+```
+
+## Add hooks as part of the configuration
+
+You can also add hooks from the configuration file itself similar to the `on_error` handler. This may help when you need to take the same action across all your jobs.
+
+For an organization, this can help the team define a set of hooks which cover the basic functionalities such as error handling, notification, logging etc.,
+
+Use case example - Notify on Airbrake when any job is buried (regardless of the type of the job).
+
+**Note:** Hooks added at the individual job level will override these hooks. 
+
+ ```ruby
+ Backburner.configure do |config|
+  config.hooks = [
+    {
+      class_name: 'Backburner::Job', # The class where the hook needs to be placed.
+      event: 'on_bury', # event of the hook
+      code_block: lambda { |e| Airbrake.notify(e) } # lambda or Proc which needs to be executed 
+    }
+  ]
+ end
+ ```
+
+

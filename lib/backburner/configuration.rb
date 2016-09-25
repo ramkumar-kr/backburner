@@ -26,7 +26,7 @@ module Backburner
       @default_priority    = 65536
       @respond_timeout     = 120
       @on_error            = nil
-      @hooks               = [] # { class_name: Job. event: 'on_bury', code_block: Proc.new{ puts "Hello, World!"  } }
+      @hooks               = [] # { class_name: 'Job', event: 'on_bury', code_block: Proc.new{ puts "Hello, World!"  } }
       @max_job_retries     = 0
       @retry_delay         = 5
       @retry_delay_proc    = lambda { |min_retry_delay, num_retries| min_retry_delay + (num_retries ** 3) }
@@ -36,7 +36,6 @@ module Backburner
       @primary_queue       = "backburner-jobs"
       @priority_labels     = PRIORITY_LABELS
       @reserve_timeout     = nil
-      attach_hooks
     end
 
     def namespace_separator=(val)
@@ -44,9 +43,16 @@ module Backburner
       @namespace_separator = val
     end
 
+    def hooks=(val)
+      @hooks = val
+      attach_hooks
+    end
+
+    private
+
     def attach_hooks
       hooks.each do |hook|
-        hook[:class_name].send(:define_singleton_method, hook[:event], hook[:code_block])
+        Object.const_get(hook[:class_name]).send(:define_singleton_method, hook[:event], hook[:code_block])
       end
     end
   end # Configuration
